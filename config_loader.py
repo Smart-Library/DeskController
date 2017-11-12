@@ -48,7 +48,7 @@ class YAMLConfigLoader:
                 # Parse YAML. The yaml.load function already puts it into a dictionary, so no conversion is necessary
                 self.__property_dictionary = yaml.load(stream)
             except yaml.YAMLError as e:
-                print e
+                print(e)
 
     '''
     Get property dictionary

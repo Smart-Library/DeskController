@@ -29,7 +29,7 @@ class Desk:
     Print Desk Info  *such wow*
     '''
     def print_info(self):
-        print "Desk Name:", self.__desk_name, ", Currently Occupied:", self.__occupied
+        print("Desk Name:", self.__desk_name, ", Currently Occupied:", self.__occupied)
 
     '''
     Gets whether or not this desk object is currently occupied
@@ -72,7 +72,7 @@ class Desk:
         # This also ensures that all subscribers get notified correctly and in order
         with self.__lock:
             self.__occupied = value == 1
-            print "Desk Occupied: ", value
+            print("Desk Occupied: ", value)
 
             for sub in self.__desk_observers:
                 sub.desk_occupied_changed(self, self.__occupied)

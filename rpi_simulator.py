@@ -1,7 +1,6 @@
 from threading import Thread, Lock
 import socket
 import time
-import struct
 
 # Pin mapping for simulator
 _pin_map = {}
@@ -67,17 +66,17 @@ class GPIO:
         global _pin_map
         global _pin_map_lock
 
-        print "[Simulator]: Set up pin", pin
+        print("[Simulator]: Set up pin", pin)
         with _pin_map_lock:
             _pin_map[pin] = (0, None)
 
     @staticmethod
     def setmode(mode):
-        print "[Simulator] Set board mode to", mode
+        print("[Simulator] Set board mode to", mode)
 
     @staticmethod
     def cleanup():
-        print "[Simulator]: Cleaned up!"
+        print("[Simulator]: Cleaned up!")
 
         if simulatorConn:
             simulatorConn.shutdown()
@@ -103,7 +102,7 @@ class SimulatorConnection:
         self.thread = Thread(target=self.server_run_thread)
         self.run_thread = True
 
-        print "[Simulator] Waiting for simulator client. Connect to:", self.serverSocket.getsockname()
+        print("[Simulator] Waiting for simulator client. Connect to:", self.serverSocket.getsockname())
         self.thread.start()
 
     # Run server thread that accepts incoming connections for simulator,
@@ -121,7 +120,7 @@ class SimulatorConnection:
         (client, caddr) = res
         self.clientSocket = client
 
-        print "Simulator Client Connected:", caddr
+        print("Simulator Client Connected:", caddr)
 
         # Set socket options with the client
         self.clientSocket.settimeout(30)
@@ -144,7 +143,7 @@ class SimulatorConnection:
                 if serror.errno == socket.errno.EAGAIN:
                     pass
                 else:
-                    print serror
+                    print(serror)
 
             # Rest
             time.sleep(0.1)
@@ -220,17 +219,17 @@ class SimulatorConnection:
         if len(chunk) < 1 or len(chunk) > 3:
             return
 
-        cmd_num = ord(chunk[0])
+        cmd_num = chunk[0]
 
         # Cmd is updating GPIO pin, requires two more arguments
         if cmd_num == 0x35:
-            arg_1 = ord(chunk[1])
-            arg_2 = ord(chunk[2])
+            arg_1 = chunk[1]
+            arg_2 = chunk[2]
 
             GPIO.output(arg_1, arg_2)
 
         elif cmd_num == 0x10:
-            print "Syncing"
+            print("Syncing")
             self.sync_with_client()
 
     def shutdown(self):
@@ -245,7 +244,7 @@ class SimulatorConnection:
         if self.clientSocket:
             self.clientSocket.close()
 
-        print "Thread stopped!"
+        print("Thread stopped!")
 
 
 simulatorConn = SimulatorConnection()

@@ -15,12 +15,12 @@ class Obs(desk.DeskObserver):
         return
 
     def desk_occupied_changed(self, sender, new_val):
-        print "[Event Received]: Desk", sender.get_name(), " Occupied:", new_val
+        print("[Event Received]: Desk", sender.get_name(), " Occupied:", new_val)
 
 
 if __name__ == "__main__":
     # Load the program configuration
-    print "Current Config:", config_loader.get_global_config().get_properties()
+    print("Current Config:", config_loader.get_global_config().get_properties())
 
     # Add observer to desk events (as a test)
     d_m = desk_pin_table.DeskPinTable()
@@ -32,7 +32,7 @@ if __name__ == "__main__":
         try:
             time.sleep(0.1)
         except KeyboardInterrupt as k:
-            print "Exit"
+            print("Exit")
             desk_pin_table.GPIO.cleanup()
             exit(0)
 

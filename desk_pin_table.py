@@ -54,7 +54,7 @@ class DeskPinTable:
 
             # Print additional information in debug mode
             if self.__conf[ConfigKeys.DEBUG_MODE]:
-                print "[ID]:", desk_id, "[Name]:", name, "[Pin]", pin
+                print("[ID]:", desk_id, "[Name]:", name, "[Pin]", pin)
 
     '''
     This method is used for detecting a rising / falling edge on the GPIO pins that are in use by the sensors
