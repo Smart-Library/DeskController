@@ -1,88 +1,100 @@
-import threading
-
-'''
-This class will essentially be a model for a desk, containing desk name, id, etc.
-Note: pin information will be stored in desk_map
-'''
-
-
 class Desk:
-    __id = -1
-    __desk_name = ""
-    __occupied = False
-    __desk_observers = None
+    """
+    This class will essentially be a model for a desk, containing desk name, id, etc.
+    Note: pin information will be stored in desk_map
+    """
 
-    # Use this for synchronizing the input_received function, since pin interrupt callbacks are async,
-    # we get some weird behaviour if we dont synchronize it
-    __lock = threading.Lock()
+    def __init__(self, desk_name, desk_id=-1, occupied=False):
+        """
+        Initialize a new desk object
+        :param desk_name: Name of desk
+        :param desk_id: ID of desk (associated with server)
+        :param occupied: Boolean of occupancy status
+        """
 
-    '''
-    Initialize Desk Object
-    '''
-    def __init__(self, desk_name, id=-1, occupied=False):
         self.__desk_name = desk_name
         self.__occupied = occupied
-        self.__id = id
+        self.__id = desk_id
         self.__desk_observers = set()
 
-    '''
-    Print Desk Info  *such wow*
-    '''
-    def print_info(self):
-        print("Desk Name:", self.__desk_name, ", Currently Occupied:", self.__occupied)
+    def __str__(self):
+        """
+        Return Desk Info  *such wow*
+        :return: String
+        """
 
-    '''
-    Gets whether or not this desk object is currently occupied
-    '''
-    def get_occupied(self):
-        with self.__lock:
-            return self.__occupied
+        return "Desk Name: '" + self.__desk_name + "', Currently Occupied: " + self.__occupied
 
-    '''
-    Get Desk ID
-    '''
-    def get_id(self):
+    @property
+    def occupied(self):
+        """
+        :return: Whether or not this desk object is currently occupied
+        """
+
+        return self.__occupied
+
+    @property
+    def desk_id(self):
+        """
+        :return: Desk ID
+        """
+
         return self.__id
 
-    '''
-    Get Desk Name
-    '''
-    def get_name(self):
+    @property
+    def name(self):
+        """
+        :return: Desk Name
+        """
+
         return self.__desk_name
 
-    '''
-    Register an observer for occupancy events
-    '''
-    def register_occupied_change_event(self, obj):
-        if obj not in self.__desk_observers:
+    def add_observer(self, obj):
+        """
+        Register an observer for occupancy events. Must implement the
+        DeskObserver protocol
+        :param obj: The object that will subscribe to desk events
+        :return: None
+        """
+
+        if isinstance(obj, DeskObserver):
             self.__desk_observers.add(obj)
 
-    '''
-    Register an observer for occupancy events
-    '''
-    def unregister_occupied_change_event(self, obj):
-        self.__desk_observers.remove(obj)
+    def remove_observer(self, obj):
+        """
+        Stop an observer from receiving desk occupancy events
+        :param obj: The object that should be removed
+        :return: None
+        """
 
-    '''
-    Input Received from GPIO pins
-    '''
+        if obj in self.__desk_observers:
+            self.__desk_observers.remove(obj)
+
     def input_received(self, pin, value):
+        """
+        Input callback for pin events from GPIO.
+        Calls all subscribed objects to notify.
+        :param pin: The pin that received the event
+        :param value: The value of the pin
+        :return: None
+        """
 
-        # Use a thread lock for synchronizing this method so that no weird behaviour occurs
-        # This also ensures that all subscribers get notified correctly and in order
-        with self.__lock:
-            self.__occupied = value == 1
-            print("Desk Occupied: ", value)
+        self.__occupied = value == 1
 
-            for sub in self.__desk_observers:
-                sub.desk_occupied_changed(self, self.__occupied)
-
-
-'''
-Protocol for subscribing to desk events
-'''
+        # Notify all subscribers
+        for sub in self.__desk_observers:
+            sub.desk_occupied_updated(self, self.__occupied)
 
 
 class DeskObserver:
-    def desk_occupied_changed(self, sender, new_val):
-        pass
+    """
+    Protocol for subscribing to desk events
+    """
+
+    def desk_occupied_updated(self, sender, new_val):
+        """
+        :param sender: The Desk Object that is sending the event whose occupancy has been updated
+        :param new_val: A boolean value of whether the desk is occupied
+        :return: None
+        """
+        raise NotImplementedError("This method must be overridden by the subclass")

@@ -1,14 +1,16 @@
 debug:
   enabled: True
   remote-simulator:
-    enabled: True
+
+    # Disable remote simulator server when running tests
+    enabled: False
     port: 9596
 
 desks:
   - id : 1
-    name: "Desk 1"
+    name: "Test 1"
     sensor_pin: 2
 
   - id : 2
-    name: "Desk 2"
+    name: "Test 2"
     sensor_pin : 3

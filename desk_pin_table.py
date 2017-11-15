@@ -1,20 +1,19 @@
-import desk
 import config_loader
-from config_loader import ConfigKeys
+from config_loader import CONFIG
+import desk
 
 # Load the remote simulator if we are not within the raspberry pi environment
 try:
     import RPi.GPIO as GPIO
 except ImportError:
+    # Load stub module and start simulator
     from rpi_simulator import GPIO as GPIO
 
 
-'''
-This class is responsible for loading the global configuration, and mapping desk objects to GPIO pins
-'''
-
-
 class DeskPinTable:
+    """
+    This class is responsible for mapping desk objects to GPIO pins, and registering pin events
+    """
 
     # In this mapping, each entry is a tuple containing the desk id, the pin, and the respective desk object
     # The purpose of desk id in the tuple is used for easy lookup of desks
@@ -22,11 +21,10 @@ class DeskPinTable:
     # The desk object is used for performing additional operations on the desk if necessary
     __desk_mapping = []
 
-    # Global Configuration object
-    __conf = None
-
     def __init__(self):
-        self.__conf = config_loader.get_global_config().get_properties()
+        """
+        Initialize the DeskPinTable object. Register all pin event callbacks
+        """
         self.__load_desk_dictionary()
 
         # Set board numbering mode
@@ -34,32 +32,33 @@ class DeskPinTable:
         # https://www.raspberrypi.org/documentation/usage/gpio/images/a-and-b-gpio-numbers.png
         GPIO.setmode(GPIO.BCM)
 
-        self.register_pin_events()
+        self.__register_pin_events()
 
-    '''
-    Load the id, pin, desk object mapping
-    '''
     def __load_desk_dictionary(self):
+        """
+        Load the config file and initialize the desk mapping object
+        :return: None
+        """
+
         # Get all desks config
-        all_desks = self.__conf[ConfigKeys.DESKS_ARRAY]
+        all_desks = config_loader.CONFIG.desks
 
         # Get info for each desk
         for d in all_desks:
-            desk_id = d[ConfigKeys.DESK_ID]
-            name = d[ConfigKeys.DESK_NAME]
-            pin = d[ConfigKeys.DESK_SENSOR_PIN]
 
             # Append id, pin, desk object to map
-            self.__desk_mapping.append((desk_id, pin, desk.Desk(name, desk_id)))
+            self.__desk_mapping.append((d.id, d.pin, desk.Desk(d.name, d.id)))
 
             # Print additional information in debug mode
-            if self.__conf[ConfigKeys.DEBUG_MODE]:
-                print("[ID]:", desk_id, "[Name]:", name, "[Pin]", pin)
+            if CONFIG.debug_config.enabled:
+                print("Added Desk to DeskPinTable: [ID]:", d.id, "[Name]:", d.name, "[Pin]:", d.pin)
 
-    '''
-    This method is used for detecting a rising / falling edge on the GPIO pins that are in use by the sensors
-    '''
-    def register_pin_events(self):
+    def __register_pin_events(self):
+        """
+        This method is used for detecting a rising / falling edge on the GPIO pins that are in use by the sensors
+        :return: None
+        """
+
         for (desk_id, pin, desk_obj) in self.__desk_mapping:
             if pin >= 0:
 
@@ -72,12 +71,24 @@ class DeskPinTable:
                 # TODO: Add some type of custom debouncing functionality, or use bouncetime = 200 below
                 GPIO.add_event_detect(pin, GPIO.BOTH, lambda channel, desk_obj=desk_obj: desk_obj.input_received(channel, GPIO.input(channel)), bouncetime=50)
 
-        return None
+    def get_desk_from_id(self, desk_id):
+        """
+        Lookup a Desk Object given it's ID
+        :param desk_id: The Desk ID to look for
+        :return: The Desk object if the ID corresponds to a Desk, or None
+        """
+        t = filter(lambda info: desk_id == info[0], self.__desk_mapping)
 
-    '''
-    Use Desk mapping to lookup a desk object given a desk ID
-    '''
-    def get_desk_from_id(self, id):
-        for (desk_id, pin, desk_obj) in self.__desk_mapping:
-            if id == desk_id:
-                return desk_obj
+        for (d_id, pin, d_obj) in t:
+            return d_obj
+
+    def get_pin_from_id(self, desk_id):
+        """
+        Lookup a Desk Pin given it's ID
+        :param desk_id: The Desk ID to look for
+        :return: The Desk Pin if the ID corresponds to a Desk, or None
+        """
+        t = filter(lambda info: desk_id == info[0], self.__desk_mapping)
+
+        for (d_id, pin, d_obj) in t:
+            return pin

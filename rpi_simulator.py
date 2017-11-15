@@ -1,22 +1,24 @@
 from threading import Thread, Lock
 import socket
 import time
+from config_loader import CONFIG
 
 # Pin mapping for simulator
 _pin_map = {}
 
-# We require a lock since there will be 2 threads that need to read/write access this variable
-# Two threads are
+simulatorConn = None
+
+# We require a lock since there will be 2 threads that need to read/write access the pin_map variable
+# The two threads are
 # 1. Main Thread for GPIO class
 # 2. Server Run Thread for Simulator connection
 _pin_map_lock = Lock()
 
-'''
-Simulates the GPIO class provided by a raspberry pi
-'''
-
 
 class GPIO:
+    """
+    Simulates (stub for) GPIO module on raspberry pi
+    """
 
     BCM = 1
     IN = 1
@@ -82,10 +84,10 @@ class GPIO:
             simulatorConn.shutdown()
 
 
-'''
-Maintains a connection with the simulator client
-'''
 class SimulatorConnection:
+    """
+    Sets up a server
+    """
     serverSocket = None
     clientSocket = None
     thread = None
@@ -95,9 +97,10 @@ class SimulatorConnection:
     run_thread = False
 
     def __init__(self):
+        # Create socket & bind
         self.serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.serverSocket.bind(("127.0.0.1", 9596))
-        self.serverSocket.listen(5)
+        self.serverSocket.bind(("127.0.0.1", CONFIG.debug_config.simulator_config.port))
+        self.serverSocket.listen(1)
 
         self.thread = Thread(target=self.server_run_thread)
         self.run_thread = True
@@ -105,9 +108,12 @@ class SimulatorConnection:
         print("[Simulator] Waiting for simulator client. Connect to:", self.serverSocket.getsockname())
         self.thread.start()
 
-    # Run server thread that accepts incoming connections for simulator,
-    # and sends / receives messages for updating GPIO
     def server_run_thread(self):
+        """
+        Run server thread that accepts incoming connections for simulator,
+        and sends / receives messages for updating GPIO
+        :return: None
+        """
 
         # Accept the simulator client
         res = self.accept_client()
@@ -148,31 +154,37 @@ class SimulatorConnection:
             # Rest
             time.sleep(0.1)
 
-    '''
-    Sets whether or not we need to sync with the client
-    '''
     def set_should_sync(self, val=True):
+        """
+        Sets whether or not we need to sync with the client
+        :param val: True if client needs to sync
+        :return: None
+        """
+
         with self.sync_client_lock:
             self.should_sync = val
 
-    '''
-    Synchronized method to see if the simulator client needs to sync up with pin map
-    '''
     def should_sync_client(self):
+        """
+        Synchronized method to see if the simulator client needs to sync up with pin map
+        :return: Whether client needs sync
+        """
         with self.sync_client_lock:
             return self.should_sync
 
-    '''
-    Synchronized method that checks to see if the thread should still be running
-    '''
     def can_run_thread(self):
+        """
+        Synchronized method that checks to see if the thread should still be running
+        :return: True if the thread can run
+        """
         with self.lock:
             return self.run_thread
 
-    '''
-    Synchronize pin map with GPIO simulator
-    '''
     def sync_with_client(self):
+        """
+        Synchronize pin map with GPIO simulator
+        :return: None
+        """
         global _pin_map
         global _pin_map_lock
 
@@ -192,10 +204,12 @@ class SimulatorConnection:
             # No longer needs to sync with client
             self.set_should_sync(False)
 
-    '''
-    Accepts a simulator client
-    '''
     def accept_client(self):
+        """
+        Accepts a simulator client.
+        Will only return if a client gets accepted.
+        :return: socket.accept tuple
+        """
         self.serverSocket.setblocking(False)
 
         while self.can_run_thread():
@@ -244,8 +258,11 @@ class SimulatorConnection:
         if self.clientSocket:
             self.clientSocket.close()
 
-        print("Thread stopped!")
+        print("[Simulator] Server Thread stopped!")
 
 
-simulatorConn = SimulatorConnection()
+if CONFIG.debug_config.simulator_config.enabled:
+    simulatorConn = SimulatorConnection()
+else:
+    print("[Simulator]: Remote simulator not enabled")
 
