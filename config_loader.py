@@ -163,6 +163,6 @@ def load_config(file_name="config/config.yaml"):
 
 # Use a different config if we are currently running in a CI environment
 if os.getenv("CI"):
-    load_config("config/config_CI.yaml")
+    load_config("tests/config/config.yaml")
 else:
     load_config()
