@@ -1,0 +1,14 @@
+debug:
+  enabled: True
+  remote-simulator:
+    enabled: False
+    port: 9596
+
+desks:
+  - id : 1
+    name: "Desk 1"
+    sensor_pin: 2
+
+  - id : 2
+    name: "Desk 2"
+    sensor_pin : 3

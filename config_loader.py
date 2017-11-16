@@ -1,5 +1,5 @@
 import yaml
-
+import os
 
 class _DeskConfigDAO:
     """
@@ -143,7 +143,7 @@ class __YAMLConfigLoader:
 CONFIG: _ConfigDAO = None
 
 
-def load_config():
+def load_config(file_name="config/config.yaml"):
     """
     This method ensures that we only load the config once.
     :return: The global Config DAO
@@ -151,7 +151,8 @@ def load_config():
     global CONFIG
 
     if not CONFIG:
-        CONFIG = _ConfigDAO(__YAMLConfigLoader("config/config.yaml").properties)
+
+        CONFIG = _ConfigDAO(__YAMLConfigLoader(file_name).properties)
 
         if CONFIG.debug_config.enabled:
             # Print config
@@ -160,4 +161,8 @@ def load_config():
     return CONFIG
 
 
-load_config()
+# Use a different config if we are currently running in a CI environment
+if os.getenv("CI"):
+    load_config("config/config_CI.yaml")
+else:
+    load_config()
