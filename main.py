@@ -23,7 +23,7 @@ if __name__ == "__main__":
     desk_map = desk_pin_table.DeskPinTable()
 
     # Add observer to desk events (as a test)
-    d: Desk = desk_map.get_desk_from_id(1)
+    d: Desk = desk_map.get_mapping_from_desk_id(1)
     d.add_observer(Obs())
 
     # Run Infinite loop so that we can receive events for pin changes

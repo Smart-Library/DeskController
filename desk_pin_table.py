@@ -71,24 +71,11 @@ class DeskPinTable:
                 # TODO: Add some type of custom debouncing functionality, or use bouncetime = 200 below
                 GPIO.add_event_detect(pin, GPIO.BOTH, lambda channel, desk_obj=desk_obj: desk_obj.input_received(channel, GPIO.input(channel)), bouncetime=50)
 
-    def get_desk_from_id(self, desk_id):
+    def get_mapping_from_desk_id(self, desk_id):
         """
-        Lookup a Desk Object given it's ID
+        Lookup desk information given it's ID
         :param desk_id: The Desk ID to look for
-        :return: The Desk object if the ID corresponds to a Desk, or None
+        :return: A tuple containing the pin number and a Desk object if the ID corresponds to a Desk, or None
         """
-        t = filter(lambda info: desk_id == info[0], self.__desk_mapping)
 
-        for (d_id, pin, d_obj) in t:
-            return d_obj
-
-    def get_pin_from_id(self, desk_id):
-        """
-        Lookup a Desk Pin given it's ID
-        :param desk_id: The Desk ID to look for
-        :return: The Desk Pin if the ID corresponds to a Desk, or None
-        """
-        t = filter(lambda info: desk_id == info[0], self.__desk_mapping)
-
-        for (d_id, pin, d_obj) in t:
-            return pin
+        return next(((pin, d_obj) for d_id, pin, d_obj in self.__desk_mapping if d_id == desk_id), None)

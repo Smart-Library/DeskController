@@ -66,9 +66,7 @@ class Desk:
         :param obj: The object that should be removed
         :return: None
         """
-
-        if obj in self.__desk_observers:
-            self.__desk_observers.remove(obj)
+        self.__desk_observers.discard(obj)
 
     def input_received(self, pin, value):
         """
