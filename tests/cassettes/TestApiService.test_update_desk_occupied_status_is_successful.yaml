@@ -1,0 +1,24 @@
+interactions:
+- request:
+    body: '{"desk": {"occupied": true}}'
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Length: ['28']
+      Content-Type: [application/json]
+      User-Agent: [python-requests/2.18.4]
+    method: PUT
+    uri: https://smart-library-app.herokuapp.com/desks/1.json
+  response:
+    body: {string: ''}
+    headers:
+      Cache-Control: [no-cache]
+      Vary: [Origin]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Request-Id: [436edb63-68c3-42f5-a872-7abbb7d05e23]
+      X-Runtime: ['0.006599']
+      X-XSS-Protection: [1; mode=block]
+    status: {code: 204, message: No Content}
+version: 1
