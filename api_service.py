@@ -4,7 +4,7 @@ class ApiService:
 	"""
 	This class will be responsible for communicating with our Heroku hosted API
 	to create and update existing desks
-    """
+	"""
 	BASE_URL = "https://smart-library-app.herokuapp.com"
 
 	@classmethod
@@ -13,7 +13,7 @@ class ApiService:
 		:param name: Name of desk to be created
 
 		:return: Response object
-        """
+		"""
 		return cls.__notify('post', '/desks.json', {'desk': {'name': name} })
 
 	@classmethod
@@ -23,7 +23,7 @@ class ApiService:
 		:param occupied_status: New occupied status of desk
 
 		:return: Response object
-        """
+		"""
 		return cls.__notify('put', f'/desks/{id}.json', {'desk': {'occupied': occupied_status} })
 
 	@classmethod
@@ -36,5 +36,5 @@ class ApiService:
 		:param payload: Data to be sent in request body
 
 		:return: Response
-        """
+		"""
 		return requests.request(method, cls.BASE_URL + endpoint, headers={'Content-Type': 'application/json'}, json=payload)
