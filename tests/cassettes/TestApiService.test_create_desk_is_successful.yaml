@@ -1,0 +1,27 @@
+interactions:
+- request:
+    body: '{"desk": {"name": "test desk"}}'
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Length: ['31']
+      Content-Type: [application/json]
+      User-Agent: [python-requests/2.18.4]
+    method: POST
+    uri: https://smart-library-app.herokuapp.com/desks.json
+  response:
+    body: {string: '{"id":35,"grouping_id":null,"name":"test desk","occupied":false,"created_at":"2017-11-26T00:51:14.170Z","updated_at":"2017-11-26T00:51:14.170Z"}'}
+    headers:
+      Cache-Control: ['max-age=0, private, must-revalidate']
+      Content-Type: [application/json; charset=utf-8]
+      ETag: [W/"baa047b15d565d652d69c58007cedd9a"]
+      Location: ['https://smart-library-app.herokuapp.com/desks/35']
+      Vary: [Origin]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Request-Id: [41778d67-a337-42fd-b0e6-5621cdb3320f]
+      X-Runtime: ['0.148741']
+      X-XSS-Protection: [1; mode=block]
+    status: {code: 201, message: Created}
+version: 1
