@@ -1,11 +1,11 @@
 import unittest
-import desk_pin_table
+import desk_sensors
 
 
 class DeskPinTableTest(unittest.TestCase):
 
     def setUp(self):
-        self.__desk_pin_table = desk_pin_table.DeskPinTable()
+        self.__desk_pin_table = desk_sensors.DeskPinTable()
 
     def test_valid_get_mapping_from_desk_id(self):
         (pin, desk_obj) = self.__desk_pin_table.get_mapping_from_desk_id(1)

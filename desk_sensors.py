@@ -2,12 +2,6 @@ import config_loader
 from config_loader import CONFIG
 import desk
 
-# Load the remote simulator if we are not within the raspberry pi environment
-try:
-    import RPi.GPIO as GPIO
-except ImportError:
-    # Load stub module and start simulator
-    from rpi_simulator import GPIO as GPIO
 
 
 class DeskPinTable:
@@ -15,9 +9,9 @@ class DeskPinTable:
     This class is responsible for mapping desk objects to GPIO pins, and registering pin events
     """
 
-    # In this mapping, each entry is a tuple containing the desk id, the pin, and the respective desk object
+    # Each entry is a tuple containing the desk id, a list of sensor objects, and the respective desk object.
     # The purpose of desk id in the tuple is used for easy lookup of desks
-    # The pin is a mapping to the desk sensor via GPIO
+    # A list of sensor objects is for all sensors linked to a desk
     # The desk object is used for performing additional operations on the desk if necessary
     __desk_mapping = []
 
@@ -26,11 +20,6 @@ class DeskPinTable:
         Initialize the DeskPinTable object. Register all pin event callbacks
         """
         self.__load_desk_dictionary()
-
-        # Set board numbering mode
-        # See the following for GPIO pin numbers:
-        # https://www.raspberrypi.org/documentation/usage/gpio/images/a-and-b-gpio-numbers.png
-        GPIO.setmode(GPIO.BCM)
 
         self.__register_pin_events()
 

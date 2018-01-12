@@ -6,7 +6,8 @@
 
 import time
 from desk import DeskObserver, Desk
-import desk_pin_table
+import desk_sensors
+from api_service import APIDeskObserver
 
 
 class Obs(DeskObserver):
@@ -20,11 +21,16 @@ class Obs(DeskObserver):
 if __name__ == "__main__":
 
     # Load the Desk-Pin table
-    desk_map = desk_pin_table.DeskPinTable()
+    desk_map = desk_sensors.DeskPinTable()
+
+    desk_obs = APIDeskObserver()
 
     # Add observer to desk events (as a test)
     (pin, d) = desk_map.get_mapping_from_desk_id(1)
-    d.add_observer(Obs())
+    d.add_observer(desk_obs)
+
+    (pin, d) = desk_map.get_mapping_from_desk_id(2)
+    d.add_observer(desk_obs)
 
     # Run Infinite loop so that we can receive events for pin changes
     while True:
@@ -34,5 +40,5 @@ if __name__ == "__main__":
             time.sleep(500)
         except KeyboardInterrupt as k:
             print("Keyboard Interrupt - Exiting")
-            desk_pin_table.GPIO.cleanup()
+            desk_sensors.GPIO.cleanup()
             exit(0)

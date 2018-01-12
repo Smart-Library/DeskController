@@ -5,10 +5,22 @@ debug:
     port: 9596
 
 desks:
-  - id : 1
+  - id: 1
+
     name: "Desk 1"
-    sensor_pin: 2
+    # Example of changes to sensor info (rather than pin #)
+    sensor:
+      type: 1
+      i2c_bus: 1
+      i2c_addr: 0xa
 
   - id : 2
     name: "Desk 2"
-    sensor_pin : 3
+    sensor:
+      type: 1
+      i2c_bus: 1
+      i2c_addr: 0xa
+
+sensors:
+  - type: 1
+    name: "Omron D6T"
