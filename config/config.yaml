@@ -1,7 +1,7 @@
 debug:
   enabled: True
   remote-simulator:
-    enabled: True
+    enabled: False
     port: 9596
 
 desks:
