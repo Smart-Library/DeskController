@@ -1,11 +1,15 @@
 import requests
+from config.config import CONFIG
 
 class ApiService:
 	"""
 	This class will be responsible for communicating with our Heroku hosted API to create and update existing desks
 	"""
 
-	BASE_URL = "https://smart-library-app.herokuapp.com"
+	if CONFIG.debug_config.enabled:
+		BASE_URL = "http://localhost:3000"
+	else:
+		BASE_URL = "https://smart-library-app.herokuapp.com"
 
 	@classmethod
 	def create_desk(cls, name):
