@@ -1,8 +1,7 @@
 from vcr_unittest import VCRTestCase
-from api_service import ApiService
+from services.api_service import ApiService
 
 class TestApiService(VCRTestCase):
-
     def test_create_desk_is_successful(self):
         response = ApiService.create_desk(name = 'test desk')
         json_response = response.json()
