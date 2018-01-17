@@ -76,8 +76,8 @@ class _ConfigDAO:
 	KEY_DESK_CONFIGS = "desks"
 
 	def __init__(self, loader):
-
-		self.__properties = loader
+		self.__loader = loader
+		self.__properties = loader.properties
 
 		self.__desks = []
 		self.__debug_config = _DebugConfigDAO(self.__properties[self.KEY_DEBUG_CONFIG])
@@ -96,6 +96,11 @@ class _ConfigDAO:
 	def __str__(self):
 		return self.__properties.__str__()
 
+	def update_desk_list(self, new_desk):
+		updated_desks = self.__loader.update_desk_list(new_desk)
+		self.__desks = [_DeskConfigDAO(desk_dict) for desk_dict in updated_desks]
+
+		return updated_desks
 
 class __YAMLConfigLoader:
 	"""
@@ -127,6 +132,22 @@ class __YAMLConfigLoader:
 				print(e)
 				raise e
 
+	def update_desk_list(self, desk_dict):
+		self.load_config()
+		self.properties['desks'].append(desk_dict)
+
+		self.__write_to_config(self.properties)
+
+		return self.properties['desks']
+
+	def __write_to_config(self, new_config):
+		with open(self.__yaml_file, 'w') as stream:
+			try:
+				stream.write(yaml.dump(new_config))
+			except yaml.YAMLError as e:
+				print(e)
+				raise e
+
 	@property
 	def properties(self):
 		"""
@@ -150,7 +171,7 @@ def load_config(file_name="config/config.yaml"):
 
 	if not CONFIG:
 
-		CONFIG = _ConfigDAO(__YAMLConfigLoader(file_name).properties)
+		CONFIG = _ConfigDAO(__YAMLConfigLoader(file_name))
 
 		if CONFIG.debug_config.enabled:
 			# Print config
