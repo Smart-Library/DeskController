@@ -4,3 +4,6 @@ vcrpy
 vcrpy-unittest
 docopt
 colorama
+mock
+crcmod
+pigpio
