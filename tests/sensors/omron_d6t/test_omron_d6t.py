@@ -6,7 +6,7 @@ from sensors.omron_d6t.omron_d6t import OmronD6T
 class TestOmronD6T(TestCase):
     def setUp(self):
         with patch.object(Sensor, "__init__", return_value = Mock()):
-            self.__omron_d6t = OmronD6T()
+            self.__omron_d6t = OmronD6T(1, 0xa)
 
         self.__room_temperature = 25
         self.__temperature_values = [ 25.5, 22.5, 28.9, 26.2,

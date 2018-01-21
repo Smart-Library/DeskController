@@ -1,6 +1,7 @@
 from config.config import CONFIG
 from services.api_service import ApiService
 
+
 class DeskHandlerService:
     """
     This class will be responsible for communicating with the ApiService and the CONFIG global
@@ -24,6 +25,6 @@ class DeskHandlerService:
         json_response = response.json()
         if response.status_code == 201:
             CONFIG.update_desk_list({'name': name, 'id': json_response['id'], 'sensor_pin': int(i2c_address)})
-            return (cls.SUCCESS_STATUS, json_response)
+            return cls.SUCCESS_STATUS, json_response
         else:
-            return (cls.FAILURE_STATUS, json_response)
+            return cls.FAILURE_STATUS, json_response

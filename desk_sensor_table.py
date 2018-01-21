@@ -3,9 +3,9 @@ from desk import Desk
 from sensors.omron_d6t.omron_d6t import OmronD6T
 
 
-class DeskPinTable:
+class DeskSensorTable:
     """
-    This class is responsible for mapping desk objects to GPIO pins, and registering pin events
+    This class is responsible for mapping desk objects to Sensors, and polling sensors occupancy data
     """
 
     # In this mapping, each entry is a tuple containing the desk id, the sensor object, and the respective desk object
@@ -33,8 +33,7 @@ class DeskPinTable:
         for d in all_desks:
 
             # Initialize sensor
-            d_sensor = d.sensor
-            sensor_obj = OmronD6T(d_sensor.i2c_bus, d_sensor.i2c_address)
+            sensor_obj = OmronD6T(d.sensor.i2c_bus, d.sensor.i2c_address)
 
             # Append id, pin, desk object to map
             self.__desk_mapping.append((d.id, sensor_obj, Desk(d.name, d.id)))
@@ -43,21 +42,26 @@ class DeskPinTable:
             if CONFIG.debug_config.enabled:
                 print("Added Desk to DeskPinTable: [ID]:", d.id, "[Name]:", d.name, "[Sensor Type]:", d.sensor.sensor_type)
 
-    def poll_loop(self):
+    def poll_desk_occupancy(self):
         """
         This method is used for polling each sensor for it's occupied status and updating the respective desk
         :return: None
         """
         for (desk_id, sensor_obj, desk_obj) in self.__desk_mapping:
             status = sensor_obj.occupied_status
+            print(status)
             desk_obj.input_received(status)
-
 
     def get_mapping_from_desk_id(self, desk_id):
         """
         Lookup desk information given it's ID
         :param desk_id: The Desk ID to look for
-        :return: A tuple containing the pin number and a Desk object if the ID corresponds to a Desk, or None
+        :return: A tuple containing the sensor object and a Desk object if the ID corresponds to a Desk, or None
         """
+        return next(((sensor_obj, d_obj) for d_id, sensor_obj, d_obj in self.__desk_mapping if d_id == desk_id), None)
 
-        return next(((pin, d_obj) for d_id, pin, d_obj in self.__desk_mapping if d_id == desk_id), None)
+    def cleanup(self):
+        # Close all i2c connections
+        for (desk_id, sensor_obj, desk_obj) in self.__desk_mapping:
+            print("Closing i2c connection for desk: " + str(desk_id))
+            sensor_obj.close_connection()

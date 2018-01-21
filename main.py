@@ -1,12 +1,7 @@
-# Potential future CLI args for this script can be:
-# start-service (starts service to communicate with cloud, watch pin status for sensors)
-# register-device (registers a device with the cloud, store device info and pin into persistent storage)
-# unregister-device (unregister a desk)
-# print-table (pretty print the table mapping sensor/desk info to pin number)
-
 import time
 from desk import DeskObserver
-import desk_pin_table
+import desk_sensor_table
+from services.api_service import ApiService
 
 
 class Obs(DeskObserver):
@@ -15,12 +10,13 @@ class Obs(DeskObserver):
 
     def desk_occupied_updated(self, sender, new_val):
         print("[Event Received]: Desk", sender.name, " Occupied:", new_val)
+        ApiService.update_desk_occupied_status(sender.desk_id, new_val)
 
 
 if __name__ == "__main__":
 
     # Load the Desk-Pin table
-    desk_map = desk_pin_table.DeskPinTable()
+    desk_map = desk_sensor_table.DeskSensorTable()
 
     # Add observer to desk events (as a test)
     (pin, d) = desk_map.get_mapping_from_desk_id(1)
@@ -29,12 +25,11 @@ if __name__ == "__main__":
     # Run Infinite loop so that we can receive events for pin changes
     while True:
         try:
-            desk_map.poll_loop()
+            desk_map.poll_desk_occupancy()
 
-            # Basically keep the main thread asleep,
-            # as everything is run on a separate thread due to pin event detection
+            # Sleep between sensor polling
             time.sleep(0.1)
         except KeyboardInterrupt as k:
             print("Keyboard Interrupt - Exiting")
-            desk_pin_table.GPIO.cleanup()
+            desk_map.cleanup()
             exit(0)
