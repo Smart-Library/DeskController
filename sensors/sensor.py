@@ -11,7 +11,7 @@ class Sensor:
         self.__buffer_length = buffer_length
 
         print("Attempting to connect to Raspberry Pi GPIO...")
-        self.__piGPIO = pigpio.pi()  # Connect locally to pi GPIO
+        self.__piGPIO = pigpio.pi('pi3.local')  # Connect remotely to pi GPIO
 
         if not self.__piGPIO.connected:
             print("Failed to connect to pi GPIO daemon")

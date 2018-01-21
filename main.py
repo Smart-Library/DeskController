@@ -5,7 +5,7 @@
 # print-table (pretty print the table mapping sensor/desk info to pin number)
 
 import time
-from desk import DeskObserver, Desk
+from desk import DeskObserver
 import desk_pin_table
 
 
@@ -29,9 +29,11 @@ if __name__ == "__main__":
     # Run Infinite loop so that we can receive events for pin changes
     while True:
         try:
+            desk_map.poll_loop()
+
             # Basically keep the main thread asleep,
             # as everything is run on a separate thread due to pin event detection
-            time.sleep(500)
+            time.sleep(0.1)
         except KeyboardInterrupt as k:
             print("Keyboard Interrupt - Exiting")
             desk_pin_table.GPIO.cleanup()

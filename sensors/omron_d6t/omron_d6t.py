@@ -11,7 +11,8 @@ class OmronD6T(Sensor):
     __MAX_CELLS_ABOVE_ROOM_TEMPERATURE = 10
 
     def __init__(self, bus = 1, address = None):
-        if not address: address = self.__I2C_ADDRESS
+        if not address:
+            address = self.__I2C_ADDRESS
         super().__init__(bus = bus, address = address, start_command = self.__START_COMMAND, buffer_length = self.__BUFFER_LENGTH)
 
     @property

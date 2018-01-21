@@ -68,16 +68,18 @@ class Desk:
         """
         self.__desk_observers.discard(obj)
 
-    def input_received(self, pin, value):
+    def input_received(self, value):
         """
-        Input callback for pin events from GPIO.
-        Calls all subscribed objects to notify.
-        :param pin: The pin that received the event
-        :param value: The value of the pin
+        Called when the sensor is polled with the occupied status of the desk.
+        Nothing happens if the occupied state has not been changed
+        :param value: The current occupied status
         :return: None
         """
 
-        self.__occupied = value == 1
+        if self.__occupied == value:
+            return
+
+        self.__occupied = value
 
         # Notify all subscribers
         for sub in self.__desk_observers:
