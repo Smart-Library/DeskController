@@ -11,7 +11,7 @@ class OmronD6T(Sensor):
     __MAX_CELLS_ABOVE_ROOM_TEMPERATURE = 10
 
     def __init__(self, bus, address):
-        super().__init__(bus, address, self.__START_COMMAND)
+        super().__init__(bus, address, self.__START_COMMAND, self.__BUFFER_LENGTH)
 
     @property
     def occupied_status(self):

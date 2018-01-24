@@ -1,6 +1,5 @@
 from time import sleep
 from config.config import CONFIG
-import time
 import pigpio
 from tests.stubs.omron_d6t_stub import PiStub
 
@@ -53,7 +52,7 @@ class Sensor:
         return self.__pi.i2c_read_device(self.__handle, self.__buffer_length)
 
     def write_raw_data(self, handle, start_command):
-        return self.__pi.i2c_write_device(self.__handle, [start_command])
+        return self.__pi.i2c_write_device(handle, start_command)
 
     @staticmethod
     def __get_pi_gpio():
