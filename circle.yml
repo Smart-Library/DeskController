@@ -1,3 +1,6 @@
 machine:
   python:
     version: 3.6.2
+test:
+  override:
+    - nosetests -w tests/ -v --with-xunit --xunit-file=${CIRCLE_TEST_REPORTS}/nosetests/nosetests.xml

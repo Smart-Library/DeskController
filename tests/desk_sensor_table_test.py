@@ -1,10 +1,14 @@
 import unittest
 import desk_sensor_table
+from mock import patch, Mock
 
 
 class DeskPinTableTest(unittest.TestCase):
 
-    def setUp(self):
+    @patch("pigpio.pi", return_value=Mock())
+    @patch("sensors.sensor.Sensor.open_connection", return_value=1)
+    @patch("sensors.sensor.Sensor.write_raw_data", return_value=True)
+    def setUp(self, mocked_pigpio, mocked_open_connection, mocked_write_raw_data):
         self.__desk_pin_table = desk_sensor_table.DeskSensorTable()
 
     def test_valid_get_mapping_from_desk_id(self):
