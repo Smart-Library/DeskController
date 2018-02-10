@@ -5,9 +5,9 @@ from config.config import CONFIG
 
 class TestDeskHandlerService(VCRTestCase):
 
-    @patch("config.config.__YAMLConfigLoader._YAMLConfigLoader__write_to_config", return_value = None)
+    @patch("config.config.__YAMLConfigLoader.save_config", return_value = None)
     def test_create_is_successful(self, mock_write_to_config):
-        (status, response) = DeskHandlerService.create(name = 'test desk', i2c_address = 15)
+        (status, response) = DeskHandlerService.create(name= 'test desk', i2c_address = 15)
 
         self.assertEqual(status, DeskHandlerService.SUCCESS_STATUS)
         self.assertTrue(self.__find_desk_from_config_global('test desk'))

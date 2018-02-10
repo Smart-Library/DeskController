@@ -24,7 +24,7 @@ class DeskHandlerService:
         response = ApiService.create_desk(name)
         json_response = response.json()
         if response.status_code == 201:
-            CONFIG.update_desk_list({'name': name, 'id': json_response['id'], 'sensor_pin': int(i2c_address)})
+            CONFIG.add_desk(json_response['id'], name, int(i2c_address))
             return cls.SUCCESS_STATUS, json_response
         else:
             return cls.FAILURE_STATUS, json_response

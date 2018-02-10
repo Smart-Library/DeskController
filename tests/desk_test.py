@@ -35,10 +35,10 @@ class TestDeskMethods(unittest.TestCase):
         self.assertEqual(self.__desk_test_obj.name, self.__desk_name, "Test init: Setting Name")
 
     def test_valid_input_received(self):
-        self.__desk_test_obj.input_received(0, 1)
+        self.__desk_test_obj.input_received(True)
         self.assertTrue(self.__desk_test_obj.occupied, "Test input_received: Setting Occupied")
 
-        self.__desk_test_obj.input_received(0, 0)
+        self.__desk_test_obj.input_received(False)
         self.assertTrue(not self.__desk_test_obj.occupied, "Test input_received: Setting Not Occupied")
 
     def test_observer_pattern(self):
@@ -47,17 +47,21 @@ class TestDeskMethods(unittest.TestCase):
         # Add observer
         self.__desk_test_obj.add_observer(test_observer)
 
+        # Initialize initial occupied status to False, so that
+        # sequential inputs trigger a notification
+        self.__desk_test_obj.input_received(False)
+
         # Make sure observer is notified with True
-        self.__desk_test_obj.input_received(0, 1)
+        self.__desk_test_obj.input_received(True)
         self.assertTrue(test_observer.is_success(self.__desk_test_obj, True))
 
         # Make sure observer is notified with False
-        self.__desk_test_obj.input_received(0, 0)
+        self.__desk_test_obj.input_received(False)
         self.assertTrue(test_observer.is_success(self.__desk_test_obj, False))
 
         # Make sure observer is removed
         self.__desk_test_obj.remove_observer(test_observer)
-        self.__desk_test_obj.input_received(0, 0)
+        self.__desk_test_obj.input_received(False)
         self.assertFalse(test_observer.is_success(self.__desk_test_obj, False))
 
 
