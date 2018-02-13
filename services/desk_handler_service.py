@@ -23,8 +23,12 @@ class DeskHandlerService:
         """
         response = ApiService.create_desk(name)
         json_response = response.json()
+
+        if type(i2c_address) is str:
+            i2c_address = int(i2c_address, 16)
+
         if response.status_code == 201:
-            CONFIG.add_desk(json_response['id'], name, int(i2c_address))
+            CONFIG.add_desk(json_response['id'], name, hex(i2c_address))
             return cls.SUCCESS_STATUS, json_response
         else:
             return cls.FAILURE_STATUS, json_response
