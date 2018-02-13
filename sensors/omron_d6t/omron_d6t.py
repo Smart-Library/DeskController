@@ -44,15 +44,15 @@ class OmronD6T(Sensor):
         """
 
         # This loop will run until a valid value is received from the sensor (or max retries is reached)
-        for i in range(0, self._MAX_RETRIES):
+        for i in range(self._MAX_RETRIES):
             bytes_read, sensor_raw_data = self.read_raw_data()
 
             if bytes_read == self.__BUFFER_LENGTH:
                 # Read PEC byte for checksum
-                crc_expected = sensor_raw_data[34]
+                crc_expected = sensor_raw_data[-1]
 
                 # Calculate CRC-8 of received bytes (excluding PEC byte at end)
-                crc_actual = self.__calculate_pec(sensor_raw_data[:34])
+                crc_actual = self.__calculate_pec(sensor_raw_data[:-1])
 
                 if crc_expected == crc_actual:
                     # Number of bytes read, and CRC is correct -> Parse Temperature data
@@ -96,10 +96,7 @@ class OmronD6T(Sensor):
         pec_buffer = []
 
         # See OMRON datasheet for PEC details
-        for i in self.__PEC_PREFIX:
-            pec_buffer.append(i)
-
-        for itm in buf:
-            pec_buffer.append(itm)
+        pec_buffer.extend(self.__PEC_PREFIX)
+        pec_buffer.extend(buf)
 
         return crc8_func(bytearray(pec_buffer))

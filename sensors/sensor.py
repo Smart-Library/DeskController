@@ -20,13 +20,14 @@ class Sensor:
         self.__retries = 0
         self.__result = 0
 
-        for i in range(0, self._MAX_RETRIES):
+        for i in range(self._MAX_RETRIES):
             self.__handle = self.open_connection()
             if self.__handle > 0:
                 self.__result = self.write_raw_data(self.__handle, [self.__start_command])
                 break
             else:
-                print('\n***** I2C initialization error ***** class=' + self.__class__.__name__ + 'handle=' + str(self.__handle) + ' retries=' + str(self.__retries))
+                print(f'\nFailed to Initialize i2c Connection: Class: {self.__class__.__name__},'
+                      f' Handle: {str(self.__handle)}, Retries: {str(self.__retries)}')
                 self.__retries += 1
 
                 # Sleep between retries
@@ -76,6 +77,6 @@ class Sensor:
                 else:
                     exit(-1)
 
-            print("Successfully Connected! (Version: " + str(Sensor.__pi_gpio_instance.get_pigpio_version()) + ")\n")
+            print(f"Successfully Connected! (Version: {Sensor.__pi_gpio_instance.get_pigpio_version()})\n")
 
         return Sensor.__pi_gpio_instance

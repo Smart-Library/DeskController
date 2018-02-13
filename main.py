@@ -2,6 +2,7 @@ import time
 from desk import DeskObserver
 import desk_sensor_table
 from services.api_service import ApiService
+import requests.exceptions
 
 
 class Obs(DeskObserver):
@@ -10,7 +11,11 @@ class Obs(DeskObserver):
 
     def desk_occupied_updated(self, sender, new_val):
         print("[Event Received]: Desk", sender.name, " Occupied:", new_val)
-        ApiService.update_desk_occupied_status(sender.desk_id, new_val)
+        try:
+            ApiService.update_desk_occupied_status(sender.desk_id, new_val)
+        except requests.exceptions.ConnectionError as cE:
+            # TODO: Handle API connection failure case
+            print(f"Failed to connect to API Service. {cE}")
 
 
 if __name__ == "__main__":
