@@ -1,16 +1,21 @@
 debug:
   enabled: True
-  remote-simulator:
-
-    # Disable remote simulator server when running tests
-    enabled: False
-    port: 9596
 
 desks:
   - id : 1
     name: "Test 1"
-    sensor_pin: 2
+    sensor:
+      type: 1
+      i2c_bus: 1
+      i2c_address: 0xa
 
   - id : 2
     name: "Test 2"
-    sensor_pin : 3
+    sensor:
+      type: 1
+      i2c_bus: 1
+      i2c_address: 0xa
+
+sensors:
+  - type: 1
+    name: "Omron D6T"

@@ -1,26 +1,32 @@
-import crcmod.predefined as crcmod
 from time import sleep
+import crcmod.predefined
 from sensors.sensor import Sensor
+
 
 class OmronD6T(Sensor):
     __START_COMMAND = 0x4c
-    __I2C_ADDRESS = 0x0a
     __ARRAY_SIZE = 16
     __BUFFER_LENGTH = 35
-    __PEC_PREFIX = 0x15
+    __PEC_PREFIX = [0x15]
     __MAX_CELLS_ABOVE_ROOM_TEMPERATURE = 10
 
-    def __init__(self, bus = 1, address = None):
-        if not address: address = self.__I2C_ADDRESS
-        super().__init__(bus = bus, address = address, start_command = self.__START_COMMAND, buffer_length = self.__BUFFER_LENGTH)
+    def __init__(self, bus, address):
+        super().__init__(bus, address, self.__START_COMMAND, self.__BUFFER_LENGTH)
 
     @property
     def occupied_status(self):
-        room_temperature, temperature_matrix = self.__read()
+        read_data = self.__read()
+
+        if read_data is None:
+            print("No data has been read")
+            return False
+
+        room_temperature, temperature_matrix = read_data
 
         return self.__temperature_cells_above_threshold(room_temperature, temperature_matrix) >= self.__MAX_CELLS_ABOVE_ROOM_TEMPERATURE
 
-    def __temperature_cells_above_threshold(self, room_temperature, temperature_array):
+    @staticmethod
+    def __temperature_cells_above_threshold(room_temperature, temperature_array):
         """
         :param room_temperature: Room temperature
         :param temperature_array: Temperature list from sensor
@@ -38,15 +44,15 @@ class OmronD6T(Sensor):
         """
 
         # This loop will run until a valid value is received from the sensor (or max retries is reached)
-        for i in range(0, self.MAX_RETRIES):
+        for i in range(self._MAX_RETRIES):
             bytes_read, sensor_raw_data = self.read_raw_data()
 
             if bytes_read == self.__BUFFER_LENGTH:
                 # Read PEC byte for checksum
-                crc_expected = sensor_raw_data[34]
+                crc_expected = sensor_raw_data[-1]
 
                 # Calculate CRC-8 of received bytes (excluding PEC byte at end)
-                crc_actual = self.__compute_crc(sensor_raw_data[:34])
+                crc_actual = self.__calculate_pec(sensor_raw_data[:-1])
 
                 if crc_expected == crc_actual:
                     # Number of bytes read, and CRC is correct -> Parse Temperature data
@@ -55,7 +61,8 @@ class OmronD6T(Sensor):
                     # Wait between retries
                     sleep(0.05)
                     continue
-            else: # Handle i2c error transmissions
+            else:
+                # Handle i2c error transmissions
                 print('\n[Error]: Number of bytes mismatch. Number of bytes read: ' + str(bytes_read))
 
                 # Wait between retries
@@ -83,13 +90,13 @@ class OmronD6T(Sensor):
 
         return room_temperature, temperature
 
-    def __compute_crc(self, buf):
-        crc8_func = crcmod.mkCrcFun('crc-8')
+    def __calculate_pec(self, buf):
+        crc8_func = crcmod.predefined.mkCrcFun('crc-8')
+
+        pec_buffer = []
 
         # See OMRON datasheet for PEC details
-        pec_buffer = [self.__PEC_PREFIX]
-
-        for itm in buf:
-            pec_buffer.append(itm)
+        pec_buffer.extend(self.__PEC_PREFIX)
+        pec_buffer.extend(buf)
 
         return crc8_func(bytearray(pec_buffer))
