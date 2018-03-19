@@ -1,6 +1,6 @@
 debug:
   enabled: True
-
+  api_base: "http://localhost:3000"
 desks:
   - id : 1
     name: "Test 1"
