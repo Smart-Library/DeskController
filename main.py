@@ -5,7 +5,7 @@ from services.api_service import ApiService
 import requests.exceptions
 
 
-class Obs(DeskObserver):
+class APIObserver(DeskObserver):
     def __init__(self):
         return
 
@@ -23,9 +23,9 @@ if __name__ == "__main__":
     # Load the Desk-Pin table
     desk_map = desk_sensor_table.DeskSensorTable()
 
-    # Add observer to desk events (as a test)
-    (pin, d) = desk_map.get_mapping_from_desk_id(1)
-    d.add_observer(Obs())
+    # Create API observer to update API service desk events (as a test)
+    obs = APIObserver()
+    desk_map.add_observer_to_all_desks(obs)
 
     # Run Infinite loop so that we can receive events for pin changes
     while True:

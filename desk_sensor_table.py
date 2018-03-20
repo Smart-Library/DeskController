@@ -65,6 +65,10 @@ class DeskSensorTable:
         except KeyError:
             return None
 
+    def add_observer_to_all_desks(self, obs):
+        for (sensor_obj, desk) in self.__desk_dict.values():
+            desk.add_observer(obs)
+
     def cleanup(self):
         # Close all i2c connections
         for (sensor_obj, desk_obj) in self.__desk_dict.values():

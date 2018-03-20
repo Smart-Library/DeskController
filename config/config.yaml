@@ -1,6 +1,6 @@
 debug:
   enabled: True
-
+  api_base: "https://smart-library-app.herokuapp.com"
 desks:
   - id : 1
     name: "Desk 1"

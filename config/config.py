@@ -135,13 +135,19 @@ class _DebugConfigDAO:
     """
 
     KEY_ENABLED = "enabled"
+    KEY_API_BASE = "api_base"
 
     def __init__(self, debug):
         self.__enabled = debug[self.KEY_ENABLED]
+        self.__api_base = debug[self.KEY_API_BASE]
 
     @property
     def enabled(self):
         return self.__enabled
+
+    @property
+    def api_base(self):
+        return self.__api_base
 
     @enabled.setter
     def enabled(self, enabled):
@@ -153,7 +159,7 @@ class _DebugConfigDAO:
         return {self.KEY_ENABLED: self.enabled}
 
     def __str__(self):
-        return "Debug Config: \n\tEnabled: " + str(self.enabled)
+        return f"Debug Config: \n\tEnabled: {str(self.enabled)}\n\tAPI Base URL: {str(self.api_base)}"
 
 
 class _ConfigDAO:
@@ -325,6 +331,4 @@ def load_config(file_name="config/config.yaml"):
     return CONFIG
 
 
-
-# Use a different config if we are currently running in a CI environment
 load_config()
